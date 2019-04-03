@@ -1,0 +1,102 @@
+---
+title: "Burritos Data - plots"
+author: "Saurabh Sharma"
+date: "November 16, 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. Create a variable called ritos and store your data in in.
+```{r}
+getwd()
+ritos = read.csv("Burritos_Data.csv")
+```
+
+2. Print the first 6 rows of ritos
+```{r}
+head(ritos)
+```
+
+3. Print the dimension of ritos
+```{r}
+dim(ritos)
+```
+
+4. Filter the data using variable nonSD == 0, store it in ritos and print the dimension of this dataset
+```{r}
+library(dplyr)
+ritos = filter(ritos, NonSD == 0)
+dim(ritos)
+```
+
+5. Print the number of unique values for Burito variable
+```{r}
+u = length(unique(ritos$Burrito))
+u
+```
+
+6. Using the Burito variable, filter data for california and print the number of unique values for the same. Hint : Use grepl to filter 'california'
+```{r}
+b = table(grepl("california", ritos$Burrito))
+length(unique(b))
+```
+
+7. Select the variables Location and Yelp and print the first 6 rows
+```{r}
+r = select(ritos, c(Location,Yelp))
+head(r)
+```
+
+8. Select columns with Burito ratings i.e. from Tortilla to Wrap and print the first 6 rows
+```{r}
+as = select(ritos,Tortilla : Wrap)
+head(as)
+```
+
+9. Create a new data frame df from ritos, select only columns 'Taste', 'Rec',
+'Cost', 'Volume
+```{r}
+df = data.frame(ritos)
+select(df, c(Taste,Rec,Cost,Volume))
+```
+
+10. Create a new column('Cost_vol') in the same dataframe df using the formula(Cost/Volume), print the first 6 rows of the df
+```{r}
+h = mutate(df, Cost_vol = Cost/Volume)
+h
+head(h)
+```
+
+11. Select burrito rating variable and recommendation(select variable rec and Tortilla to Taste), store this in a new variable called ing and print the first 6 rows
+```{r}
+ing = select(ritos, c(Rec,Tortilla : Taste))
+ing
+```
+
+12. Convert the above data to long format and store in variable df.melt; use 'Rec' and 'Taste' as your id variables, print the structure of this dataset
+```{r}
+library("UsingR")
+library("reshape2")
+df.melt = melt(ing, id = c("Rec", "Taste"))
+df.melt
+structure(df.melt)
+```
+
+13. Plot(ggplot and geom_point) the above dataset using x variable 'Taste' and y variable 'Value'
+```{r}
+ggplot(df.melt, aes(x = Taste, y = value, fill = value)) + geom_point()
+```
+
+14. Create a facet_wrap of df.melt use x-axis="Taste", y-axis="Value" and colour = "variable", use geom_point, add a smoother(lm) using geom_smooth, colour the smoother in "black", give the x axis label as 'Burrito Qulaity' and y-axis label as 'score'
+```{r}
+ggplot(df.melt, aes(x = Taste, y = value, color = variable)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "black") +
+  facet_wrap(~variable) +
+  labs(x = "Burrito Quality", y = "Score")
+```
